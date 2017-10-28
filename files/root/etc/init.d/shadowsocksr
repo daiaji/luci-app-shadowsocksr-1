@@ -179,14 +179,14 @@ ssr_local() {
 
 start_tunnel() {
 	gen_config_file $1
-	ssr-tunnel -c $CONFIG_FILE -u \
+	ssr_local -c $CONFIG_FILE -u \
 		-l $(uci_get_by_type port_forward local_port 5300) \
 		-L $(uci_get_by_type port_forward destination 8.8.4.4:53) \
-		-f /var/run/ssr-tunnel.pid
+		-f /var/run/ssr_local.pid
 }
 
 ssr_tunnel() {
-	command -v ssr-tunnel >/dev/null 2>&1 || return 0
+	command -v ssr_local >/dev/null 2>&1 || return 0
 	local server=$(uci_get_by_type port_forward server)
 	valid_server $server && start_tunnel $server
 }
@@ -220,7 +220,7 @@ kill_all() {
 
 stop() {
 	/usr/bin/ssr-rules -f
-	kill_all ssr-redir ssr-local ssr-tunnel
+	kill_all ssr-redir ssr-local
 	rm -f /var/dnsmasq.d/ssr.conf /var/dnsmasq.d/ssr-servers.conf 2>/dev/null
 	del_cron
 }
